@@ -96,3 +96,59 @@
   </div>
 </dialog>
 
+
+<!-- Book description section -->
+<div class="container mt-8 mx-auto px-4 sm:px-6 lg:px-8">
+  <h1 class="text-5xl font-bold tracking-tight text-blue-900">{{ .Product.Title }}</h1>
+  <div class="mt-6 max-w-4xl">
+    <p class="mt-6 text-xl leading-8 text-gray-600">{{ html_format .Product.DescriptionHtml }}</p>
+ 
+    <!-- <div class="mt-6"> 
+      <a href="https://istio.io" target="_blank" class="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-700">Learn more about Istio <span aria-hidden="true">→</span></a>
+    </div> -->
+
+  </div>
+</div>
+
+
+<!-- Book details table -->
+<div class="container mt-8 mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="mt-4 py-10">
+      <div class="max-w-2xl">
+        <div class="flow-root">
+          {{ if eq .Details.Status 200  }}
+          <h4 class="text-3xl font-semibold">Book Details</h4>
+          <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+              <table class="min-w-full divide-y divide-gray-300">
+                <thead>
+                  <tr>
+                    <th scope="col" class="whitespace-nowrap py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">ISBN-10</th>
+                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Publisher</th>
+                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Pages</th>
+                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Type</th>
+                    <th scope="col" class="whitespace-nowrap px-2 py-3.5 text-left text-sm font-semibold text-gray-900">Language</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                  <tr>
+                    <td class="whitespace-nowrap py-2 pl-4 pr-3 text-sm text-gray-500 sm:pl-0">{{ .Details.ISBN10 }}</td>
+                    <td class="whitespace-nowrap px-2 py-2 text-sm font-medium text-gray-900">{{ .Details.Publisher }}</td>
+                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-900">{{ .Details.Pages }}</td>
+                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ .Details.Type }}</td>
+                    <td class="whitespace-nowrap px-2 py-2 text-sm text-gray-500">{{ .Details.Language }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {{ else }}
+          <p class="text-2xl text-red-500">Error fetching product details</p>
+          {{ if ne .Details.Error "" }}
+          <p class="text-lg text-gray-600">{{ .Details.Error }}</p>
+          {{ end }}
+          {{ end }}
+        </div>
+      </div>
+  </div>
+</div>

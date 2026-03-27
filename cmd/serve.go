@@ -14,8 +14,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+type Base struct {
+	Status int
+	Error  string
+}
+
 type ProductPage struct {
-	User string
+	User    string
+	Product Product
+	Details Details
+}
+
+type Product struct {
+	Title           string
+	DescriptionHtml string
+}
+
+type Details struct {
+	Base
+	ISBN10    string
+	Publisher string
+	Pages     int
+	Type      string
+	Language  string
 }
 
 const defaultContentType string = "text/html,charset=utf-8"
@@ -33,11 +54,30 @@ var serveCmd = &cobra.Command{
 
 		r.GET("/productpage", func(c *gin.Context) {
 			data, _ := os.ReadFile("templates/productPage.html")
-			tmpl, err := template.New("productpage").Parse(string(data))
+
+			funcs := template.FuncMap{"html_format": func(s string) template.HTML {
+				return template.HTML(s)
+			}}
+
+			tmpl, err := template.New("productpage").Funcs(funcs).Parse(string(data))
 			if err != nil {
 				c.Data(http.StatusInternalServerError, defaultContentType, []byte(err.Error()))
 			}
-			productPage := ProductPage{User: "admin"}
+			productPage := ProductPage{
+				User: "admin",
+				Product: Product{
+					Title:           "The Comedy of Errors",
+					DescriptionHtml: `<a href="https://en.wikipedia.org/wiki/The_Comedy_of_Errors">Wikipedia Summary</a>: The Comedy of Errors is one of <b>William Shakespeare\'s</b> early plays. It is his shortest and one of his most farcical comedies, with a major part of the humour coming from slapstick and mistaken identity, in addition to puns and word play.`,
+				},
+				Details: Details{
+					Base:      Base{Status: 200},
+					ISBN10:    "1234567890",
+					Publisher: "PublisherA",
+					Pages:     200,
+					Type:      "paperback",
+					Language:  "English",
+				},
+			}
 			buf := bytes.Buffer{}
 			err = tmpl.Execute(&buf, productPage)
 			if err != nil {
