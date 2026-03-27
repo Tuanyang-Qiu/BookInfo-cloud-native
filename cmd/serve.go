@@ -6,6 +6,7 @@ package cmd
 import (
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -19,6 +20,12 @@ var serveCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 
 		r := gin.Default()
+
+		data, _ := os.ReadFile("templates/index.html")
+		r.GET("/", func(c *gin.Context) {
+			c.Data(http.StatusOK, "text/html,charset=utf-8", data)
+		})
+
 		r.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"message": "pong"})
 		})
