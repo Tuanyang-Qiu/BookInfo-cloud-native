@@ -4,13 +4,21 @@ Copyright © 2026 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
+
+type ProductPage struct {
+	User string
+}
+
+const defaultContentType string = "text/html,charset=utf-8"
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -21,14 +29,33 @@ var serveCmd = &cobra.Command{
 
 		r := gin.Default()
 
-		data, _ := os.ReadFile("templates/index.html")
+		r.Static("/static", "./static")
+
+		r.GET("/productpage", func(c *gin.Context) {
+			data, _ := os.ReadFile("templates/productPage.html")
+			tmpl, err := template.New("productpage").Parse(string(data))
+			if err != nil {
+				c.Data(http.StatusInternalServerError, defaultContentType, []byte(err.Error()))
+			}
+			productPage := ProductPage{User: "admin"}
+			buf := bytes.Buffer{}
+			err = tmpl.Execute(&buf, productPage)
+			if err != nil {
+				c.Data(http.StatusInternalServerError, defaultContentType, []byte(err.Error()))
+				return
+			}
+			c.Data(http.StatusOK, defaultContentType, buf.Bytes())
+		})
+
 		r.GET("/", func(c *gin.Context) {
-			c.Data(http.StatusOK, "text/html,charset=utf-8", data)
+			data, _ := os.ReadFile("templates/index.html")
+			c.Data(http.StatusOK, defaultContentType, data)
 		})
 
 		r.GET("/ping", func(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{"message": "pong"})
 		})
+
 		r.Run()
 		fmt.Println("serve called!!!")
 	},
