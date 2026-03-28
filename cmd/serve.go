@@ -23,6 +23,7 @@ type ProductPage struct {
 	User    string
 	Product Product
 	Details Details
+	Reviews Reviews
 }
 
 type Product struct {
@@ -37,6 +38,22 @@ type Details struct {
 	Pages     int
 	Type      string
 	Language  string
+}
+type Rating struct {
+	Base
+	Stars int
+	Color string
+}
+type Review struct {
+	Rating   Rating
+	Text     string
+	Reviewer string
+}
+type Reviews struct {
+	Base
+	Reviews     []Review
+	PodName     string
+	ClusterName string
 }
 
 const defaultContentType string = "text/html,charset=utf-8"
@@ -57,6 +74,10 @@ var serveCmd = &cobra.Command{
 
 			funcs := template.FuncMap{"html_format": func(s string) template.HTML {
 				return template.HTML(s)
+			}, "inRange": func(stars int) []int {
+				return make([]int, stars)
+			}, "sub": func(a, b int) int {
+				return a - b
 			}}
 
 			tmpl, err := template.New("productpage").Funcs(funcs).Parse(string(data))
@@ -76,6 +97,31 @@ var serveCmd = &cobra.Command{
 					Pages:     200,
 					Type:      "paperback",
 					Language:  "English",
+				},
+				Reviews: Reviews{
+					Base: Base{Status: 200},
+					Reviews: []Review{
+						{
+							Rating: Rating{
+								Base:  Base{Status: 200},
+								Stars: 4,
+								Color: "black",
+							},
+							Text:     "good",
+							Reviewer: "test user 1",
+						},
+						{
+							Rating: Rating{
+								Base:  Base{Status: 200},
+								Stars: 5,
+								Color: "red",
+							},
+							Text:     "very good",
+							Reviewer: "test user 2",
+						},
+					},
+					PodName:     "test pod 1",
+					ClusterName: "test cluster 1",
 				},
 			}
 			buf := bytes.Buffer{}
